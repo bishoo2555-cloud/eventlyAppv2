@@ -96,7 +96,7 @@ class _AddEventScreenState extends State<EditEvent> {
         iconTheme: IconThemeData(color: AppColor.primaryLightColor),
         backgroundColor: Colors.transparent,
         title: Text(
-          S.of(context).CreateEvent,
+          'Edit event',
           style: AppStyle.reglur22Primary,
         ),
       ),
@@ -244,7 +244,7 @@ class _AddEventScreenState extends State<EditEvent> {
                         saveEdit(context);
                         Navigator.pop(context);
                       },
-                      text: S.of(context).addEvent,
+                      text: 'Edit',
                     )
                   ],
                 ),
