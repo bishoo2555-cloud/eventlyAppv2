@@ -192,9 +192,144 @@ class _HomeTabState extends State<HomeTab> {
                         padding: EdgeInsets.symmetric(horizontal: width * 0.03),
                         child: InkWell(
                             onTap: () {
-                              Navigator.of(context).pushNamed(
-                                AppRoutes.editEvent,
-                                arguments: events[index],
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(25)),
+                                ),
+                                builder: (context) {
+                                  return FractionallySizedBox(
+                                    heightFactor: 0.5,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Center(
+                                            child: Container(
+                                              width: 45,
+                                              height: 5,
+                                              decoration: BoxDecoration(
+                                                color: Colors.blue
+                                                    .withOpacity(0.4),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Text(events[index].title,
+                                              style: themeProvider.isDarkMode
+                                                  ? AppStyle.bold12White
+                                                  : AppStyle.bold14Black),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              const Icon(Icons.calendar_today,
+                                                  size: 18,
+                                                  color: Colors.blueAccent),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                events[index]
+                                                    .eventdateTime
+                                                    .toString()
+                                                    .split(".")
+                                                    .first,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall,
+                                              ),
+                                              const Spacer(),
+                                              const Icon(Icons.location_on,
+                                                  size: 18,
+                                                  color: Colors.redAccent),
+                                              const SizedBox(width: 6),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child: Center(
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(12),
+                                                  decoration: BoxDecoration(
+                                                    color: Theme.of(context)
+                                                        .cardColor
+                                                        .withOpacity(0.7),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    border: Border.all(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.2)),
+                                                  ),
+                                                  child: Text(
+                                                    events[index].decription,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium
+                                                        ?.copyWith(
+                                                          height: 1.5,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Row(
+                                            children: [
+                                              Spacer(),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: width * .01),
+                                                child: ElevatedButton.icon(
+                                                  onPressed: () {
+                                                    Navigator.of(context)
+                                                        .pushNamed(
+                                                      AppRoutes.editEvent,
+                                                      arguments: events[index],
+                                                    );
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.edit_calendar),
+                                                  label:
+                                                      const Text("Edit Event"),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Theme.of(context)
+                                                            .primaryColor,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                    ),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical:
+                                                                height * .01,
+                                                            horizontal:
+                                                                width * .01),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
                               );
                             },
                             child: EventItem(event: events[index])));
