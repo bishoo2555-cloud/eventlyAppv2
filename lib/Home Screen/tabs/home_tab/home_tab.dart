@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../Home Screen/tabs/home_tab/widget/category_item.dart';
+import '../../../utils/app_routes.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
@@ -28,7 +29,7 @@ class _HomeTabState extends State<HomeTab> {
     var languageProvider = Provider.of<AppLanguageProvider>(context);
     var themeProvider = Provider.of<AppThemeProvider>(context);
     var categories = CategoryModel.getCategoriesWithAll(context);
-    var selectedCategoryId = categories[selectedIndex].id; // استخدم id ثابت
+    var selectedCategoryId = categories[selectedIndex].id;
 
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -96,7 +97,6 @@ class _HomeTabState extends State<HomeTab> {
       ),
       body: Column(
         children: [
-          // ====== الجزء العلوي: tabs/categories ======
           Container(
             padding: EdgeInsets.symmetric(
                 vertical: height * 0.011, horizontal: width * .03),
@@ -151,7 +151,6 @@ class _HomeTabState extends State<HomeTab> {
             ),
           ),
 
-          // ====== عرض الأحداث (Realtime) و فلترة حسب categoryId ======
           Expanded(
             child: StreamBuilder<QuerySnapshot<EventModel>>(
               stream: FireBaseUtils.getEvent().snapshots(),
@@ -164,19 +163,16 @@ class _HomeTabState extends State<HomeTab> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 }
 
-                // docs -> EventModel thanks to withConverter
                 var events =
                     snapshot.data?.docs.map((doc) => doc.data()).toList() ??
                         <EventModel>[];
 
-                // فلترة حسب categoryId الثابت
                 if (selectedCategoryId != "all") {
                   events = events
                       .where((e) => e.categoryId == selectedCategoryId)
                       .toList();
                 }
 
-                // ترتيب حسب التاريخ (الأقدم أول)
                 events
                     .sort((a, b) => a.eventdateTime.compareTo(b.eventdateTime));
 
@@ -194,7 +190,14 @@ class _HomeTabState extends State<HomeTab> {
                   itemBuilder: (context, index) {
                     return Padding(
                         padding: EdgeInsets.symmetric(horizontal: width * 0.03),
-                        child: EventItem(event: events[index]));
+                        child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).pushNamed(
+                                AppRoutes.editEvent,
+                                arguments: events[index],
+                              );
+                            },
+                            child: EventItem(event: events[index])));
                   },
                 );
               },

@@ -1,11 +1,10 @@
-import 'package:eventlyapp/utils/app_assets.dart';
+import 'package:eventlyapp/firebase/add_event_moder.dart';
+import 'package:eventlyapp/firebase/firebase_utils.dart';
 import 'package:eventlyapp/utils/app_color.dart';
 import 'package:eventlyapp/utils/app_style.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
-
-import '../../../firebase/add_event_moder.dart';
 
 class EventItem extends StatefulWidget {
   final EventModel event;
@@ -17,8 +16,6 @@ class EventItem extends StatefulWidget {
 }
 
 class _EventItemState extends State<EventItem> {
-  bool isLiked = false;
-
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -83,17 +80,35 @@ class _EventItemState extends State<EventItem> {
                     ),
                   ),
                   IconButton(
-                      onPressed: () {
+                    onPressed: () async {
+                      final prev = widget.event.isFav;
+                      setState(() {
+                        widget.event.isFav = !prev;
+                      });
+                      try {
+                        if (widget.event.id.isEmpty) {
+                          throw 'Event id is empty';
+                        }
+                        await FireBaseUtils.updateEventFav(
+                            widget.event.id, widget.event.isFav);
+                      } catch (e) {
                         setState(() {
-                          isLiked = !isLiked;
+                          widget.event.isFav = prev;
                         });
-                      },
-                      icon: Icon(
-                        isLiked ? Clarity.heart_solid : Clarity.heart_line,
-                        color: isLiked
-                            ? AppColor.primaryLightColor
-                            : AppColor.primaryLightColor,
-                      ))
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('error$e')),
+                        );
+                      }
+                    },
+                    icon: Icon(
+                      widget.event.isFav
+                          ? Clarity.heart_solid
+                          : Clarity.heart_line,
+                      color: widget.event.isFav
+                          ? AppColor.primaryLightColor
+                          : Colors.white,
+                    ),
+                  )
                 ],
               ),
             )

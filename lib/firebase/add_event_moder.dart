@@ -3,12 +3,12 @@ class EventModel {
   String id;
   String title;
   String decription;
-  String eventName; // الاسم اللي يظهر للمستخدم (مترجم حسب اللغة)
+  String eventName;
   String eventImage;
   DateTime eventdateTime;
   String eventTime;
   bool isFav;
-  String categoryId; // ✅ جديد: الفئة الثابتة (مثال: "sport", "birthday")
+  String categoryId;
 
   EventModel({
     this.id = '',
