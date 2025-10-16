@@ -26,13 +26,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseFirestore.instance.disableNetwork();
   await SharedPreferences.getInstance();
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AppLanguageProvider()),
     ChangeNotifierProvider(create: (context) => AppThemeProvider())
   ], child: EventlyApp()));
+  await FirebaseFirestore.instance.disableNetwork();
 }
 
 class EventlyApp extends StatelessWidget {
