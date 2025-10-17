@@ -3,6 +3,7 @@ import 'package:eventlyapp/Home%20Screen/tabs/home_tab/event_item.dart';
 import 'package:eventlyapp/Home%20Screen/tabs/home_tab/widget/event_tab_item.dart';
 import 'package:eventlyapp/Providers/app_language_provider.dart';
 import 'package:eventlyapp/Providers/app_theme_provider.dart';
+import 'package:eventlyapp/Providers/user_provider.dart';
 import 'package:eventlyapp/firebase/add_event_moder.dart';
 import 'package:eventlyapp/firebase/firebase_utils.dart';
 import 'package:eventlyapp/generated/l10n.dart';
@@ -30,7 +31,7 @@ class _HomeTabState extends State<HomeTab> {
     var themeProvider = Provider.of<AppThemeProvider>(context);
     var categories = CategoryModel.getCategoriesWithAll(context);
     var selectedCategoryId = categories[selectedIndex].id;
-
+    var userProvider = Provider.of<UserProvider>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
 
@@ -51,7 +52,7 @@ class _HomeTabState extends State<HomeTab> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 Text(
-                  "ROUTE ACADEMY",
+                  userProvider.currentUser!.name,
                   style: AppStyle.bold24White,
                 ),
               ],

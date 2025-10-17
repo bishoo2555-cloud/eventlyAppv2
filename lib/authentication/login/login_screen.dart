@@ -2,6 +2,8 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:eventlyapp/Home%20Screen/tabs/widgets/custom_elevated_button.dart';
 import 'package:eventlyapp/Home%20Screen/tabs/widgets/custom_textformfiled.dart';
 import 'package:eventlyapp/Providers/app_language_provider.dart';
+import 'package:eventlyapp/Providers/user_provider.dart';
+import 'package:eventlyapp/firebase/firebase_utils.dart';
 import 'package:eventlyapp/generated/l10n.dart';
 import 'package:eventlyapp/utils/app_assets.dart';
 import 'package:eventlyapp/utils/app_color.dart';
@@ -11,6 +13,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:provider/provider.dart';
+
+import '../../firebase/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -195,7 +199,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     CustomElevatedButton(
                       backgroundColor: Colors.transparent,
-                      onPressed: login,
+                      onPressed: () async {
+                        var userCredential =
+                            await FireBaseUtils.signInWithGoogle();
+
+                        if (userCredential != null) {
+                          var user = userCredential.user!;
+
+                          await FireBaseUtils.AddUserToFireStore(
+                            MyUser(
+                              id: user.uid,
+                              email: user.email ?? '',
+                              name: user.displayName ?? '',
+                            ),
+                          );
+                          Navigator.of(context)
+                              .pushReplacementNamed(AppRoutes.homescreen);
+                        }
+                      },
                       text: S.of(context).login_with_google,
                       borderColor: AppColor.primaryLightColor,
                       textStyle: AppStyle.medium20Primary,
@@ -242,7 +263,13 @@ class _LoginScreenState extends State<LoginScreen> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-
+        var user = await FireBaseUtils.readUserFromFireStore(
+            credential.user?.uid ?? '');
+        if (user == null) {
+          return;
+        }
+        var userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.updateUser(user);
         Navigator.of(context).pushNamedAndRemoveUntil(
           AppRoutes.homescreen,
           (route) => false,

@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eventlyapp/Home%20Screen/home_screen.dart';
 import 'package:eventlyapp/Home%20Screen/tabs/home_tab/widget/edit_event.dart';
 import 'package:eventlyapp/Home%20Screen/tabs/profile%20tab/profile_screen.dart';
 import 'package:eventlyapp/Providers/app_language_provider.dart';
 import 'package:eventlyapp/Providers/app_theme_provider.dart';
+import 'package:eventlyapp/Providers/user_provider.dart';
 import 'package:eventlyapp/add%20event/add_event_screen.dart';
 import 'package:eventlyapp/authentication/login/login_screen.dart';
 import 'package:eventlyapp/authentication/register/register_screen.dart';
@@ -22,7 +22,6 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -30,9 +29,10 @@ void main() async {
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => AppLanguageProvider()),
+    ChangeNotifierProvider(create: (context) => UserProvider()),
     ChangeNotifierProvider(create: (context) => AppThemeProvider())
   ], child: EventlyApp()));
-  await FirebaseFirestore.instance.disableNetwork();
+  // await FirebaseFirestore.instance.disableNetwork();
 }
 
 class EventlyApp extends StatelessWidget {
