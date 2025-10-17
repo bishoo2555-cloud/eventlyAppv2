@@ -28,9 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool isObscured = true;
   TextEditingController emailController =
-      TextEditingController(text: "sakata@sadman.sad");
+      TextEditingController(text: "firestore@gmail.com");
   TextEditingController passwordController =
-      TextEditingController(text: "Always alone");
+      TextEditingController(text: "123456");
 
   int? _getCurrentLanguageValue(String language) {
     switch (language) {

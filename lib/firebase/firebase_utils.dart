@@ -5,8 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FireBaseUtils {
-  static CollectionReference<EventModel> getEvent() {
-    return FirebaseFirestore.instance
+  static CollectionReference<EventModel> getEvent(String uid) {
+    return getUsersCollection()
+        .doc(uid)
         .collection(EventModel.collectionName)
         .withConverter<EventModel>(
           fromFirestore: (snapshot, options) =>
@@ -15,25 +16,25 @@ class FireBaseUtils {
         );
   }
 
-  static Future<void> addEventToFireStore(EventModel eventModel) {
-    CollectionReference<EventModel> collectionRef = getEvent();
+  static Future<void> addEventToFireStore(EventModel eventModel, String uid) {
+    CollectionReference<EventModel> collectionRef = getEvent(uid);
     DocumentReference<EventModel> docRef = collectionRef.doc();
     eventModel.id = docRef.id;
     return docRef.set(eventModel);
   }
 
-  static Future<void> updateEventFav(String eventId, bool isFav) {
+  static Future<void> updateEventFav(String eventId, bool isFav, String uid) {
     if (eventId.isEmpty) {
       return Future.error('Event id is empty');
     }
-    return getEvent().doc(eventId).update({'if_fav': isFav});
+    return getEvent(uid).doc(eventId).update({'if_fav': isFav});
   }
 
-  static Future<void> updateEvent(EventModel event) {
+  static Future<void> updateEvent(EventModel event, String uid) {
     if (event.id.isEmpty) {
       return Future.error('Event id is empty');
     }
-    return getEvent().doc(event.id).set(event);
+    return getEvent(uid).doc(event.id).set(event);
   }
 
   static CollectionReference<MyUser> getUsersCollection() {

@@ -6,6 +6,7 @@ import 'package:eventlyapp/firebase/firebase_utils.dart';
 import 'package:eventlyapp/generated/l10n.dart';
 import 'package:eventlyapp/utils/app_color.dart';
 import 'package:eventlyapp/utils/app_style.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 
@@ -55,7 +56,11 @@ class _FavoriteTabState extends State<FavoriteTab> {
             ),
             Expanded(
               child: StreamBuilder<QuerySnapshot<EventModel>>(
-                stream: FireBaseUtils.getEvent().snapshots(),
+                stream: FirebaseAuth.instance.currentUser == null
+                    ? const Stream.empty()
+                    : FireBaseUtils.getEvent(
+                            FirebaseAuth.instance.currentUser!.uid)
+                        .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -63,10 +68,12 @@ class _FavoriteTabState extends State<FavoriteTab> {
                   if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   }
+
                   var events =
                       snapshot.data?.docs.map((doc) => doc.data()).toList() ??
-                          <EventModel>[];
+                          [];
                   events = events.where((e) => e.isFav).toList();
+
                   if (query.isNotEmpty) {
                     events = events
                         .where((e) =>
@@ -75,13 +82,17 @@ class _FavoriteTabState extends State<FavoriteTab> {
                             e.eventName.toLowerCase().contains(query))
                         .toList();
                   }
+
                   events.sort(
                       (a, b) => a.eventdateTime.compareTo(b.eventdateTime));
+
                   if (events.isEmpty) {
                     return const Center(
-                        child: Text('No favorites FOUND ',
-                            style: TextStyle(fontSize: 16)));
+                      child: Text('No favorites FOUND ',
+                          style: TextStyle(fontSize: 16)),
+                    );
                   }
+
                   return ListView.separated(
                     padding: EdgeInsets.only(top: height * 0.02),
                     itemCount: events.length,

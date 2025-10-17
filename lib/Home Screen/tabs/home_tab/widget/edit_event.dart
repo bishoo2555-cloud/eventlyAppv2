@@ -9,6 +9,7 @@ import 'package:eventlyapp/generated/l10n.dart';
 import 'package:eventlyapp/utils/app_assets.dart';
 import 'package:eventlyapp/utils/app_color.dart';
 import 'package:eventlyapp/utils/app_style.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -288,6 +289,13 @@ class _AddEventScreenState extends State<EditEvent> {
       return;
     }
 
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('User not logged in')));
+      return;
+    }
+
     final categories = CategoryModel.getCategories(context);
     final selectedCategory = categories[selectedIndex];
 
@@ -310,14 +318,16 @@ class _AddEventScreenState extends State<EditEvent> {
     );
 
     try {
+      final collection = FireBaseUtils.getEvent(currentUser.uid);
+
       if (updatedEvent.id.isEmpty) {
-        final collection = FireBaseUtils.getEvent();
         final docRef = collection.doc();
         updatedEvent.id = docRef.id;
         await docRef.set(updatedEvent);
       } else {
-        await FireBaseUtils.getEvent().doc(updatedEvent.id).set(updatedEvent);
+        await collection.doc(updatedEvent.id).set(updatedEvent);
       }
+
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context)

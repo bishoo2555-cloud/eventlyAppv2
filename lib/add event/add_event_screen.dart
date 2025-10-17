@@ -9,6 +9,7 @@ import 'package:eventlyapp/generated/l10n.dart';
 import 'package:eventlyapp/utils/app_assets.dart';
 import 'package:eventlyapp/utils/app_color.dart';
 import 'package:eventlyapp/utils/app_style.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -226,10 +227,16 @@ class _AddEventScreenState extends State<AddEventScreen> {
     setState(() {});
   }
 
-  void addEvent(BuildContext context, int selectedIndex) {
+  void addEvent(BuildContext context, int selectedIndex) async {
     if (formKey.currentState?.validate() == true && selectedDate != null) {
       final categories = CategoryModel.getCategories(context);
       final selectedCategory = categories[selectedIndex];
+
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        print('User not logged in');
+        return;
+      }
 
       EventModel event = EventModel(
         title: titleController.text,
@@ -240,10 +247,12 @@ class _AddEventScreenState extends State<AddEventScreen> {
         eventTime: formatTime ?? '',
         categoryId: selectedCategory.id,
       );
-      FireBaseUtils.addEventToFireStore(event).timeout(
-        Duration(seconds: 1),
-        onTimeout: () => print('succes'),
+
+      await FireBaseUtils.addEventToFireStore(event, currentUser.uid).timeout(
+        const Duration(seconds: 1),
+        onTimeout: () => print('success'),
       );
+
       Navigator.pop(context);
     }
   }

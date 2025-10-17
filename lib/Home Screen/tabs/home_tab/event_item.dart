@@ -2,6 +2,7 @@ import 'package:eventlyapp/firebase/add_event_moder.dart';
 import 'package:eventlyapp/firebase/firebase_utils.dart';
 import 'package:eventlyapp/utils/app_color.dart';
 import 'package:eventlyapp/utils/app_style.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intl/intl.dart';
@@ -85,18 +86,28 @@ class _EventItemState extends State<EventItem> {
                       setState(() {
                         widget.event.isFav = !prev;
                       });
+
                       try {
                         if (widget.event.id.isEmpty) {
                           throw 'Event id is empty';
                         }
+
+                        final currentUser = FirebaseAuth.instance.currentUser;
+                        if (currentUser == null) {
+                          throw 'User not logged in';
+                        }
+
                         await FireBaseUtils.updateEventFav(
-                            widget.event.id, widget.event.isFav);
+                          widget.event.id,
+                          widget.event.isFav,
+                          currentUser.uid,
+                        );
                       } catch (e) {
                         setState(() {
                           widget.event.isFav = prev;
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('error$e')),
+                          SnackBar(content: Text('Error: $e')),
                         );
                       }
                     },
